@@ -115,8 +115,27 @@ else()
 endif()
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/../packages.config ${CMAKE_CURRENT_BINARY_DIR}/packages.config COPYONLY)
+
+
+FetchContent_Declare(
+    win_pix_runtime
+    URL https://www.nuget.org/api/v2/package/WinPixEventRuntime/1.0.190604001
+)
+FetchContent_MakeAvailable(win_pix_runtime)
+
+
 add_library(WinPixEventRuntime INTERFACE IMPORTED GLOBAL)
-set_target_properties(WinPixEventRuntime PROPERTIES INTERFACE_LINK_LIBRARIES "${CMAKE_BINARY_DIR}/packages/WinPixEventRuntime.1.0.190604001/build/WinPixEventRuntime.targets")
+#set_target_properties(WinPixEventRuntime PROPERTIES INTERFACE_LINK_LIBRARIES "${win_pix_runtime_SOURCE_DIR}/build/WinPixEventRuntime.targets")
+set_target_properties(
+   WinPixEventRuntime
+   PROPERTIES
+      INTERFACE_INCLUDE_DIRECTORIES "${win_pix_runtime_SOURCE_DIR}/include/WinPixEventRuntime"
+		IMPORTED_LOCATION "${win_pix_runtime_SOURCE_DIR}/bin/x64/WinPixEventRuntime.dll")
+target_link_libraries(
+   WinPixEventRuntime
+   INTERFACE
+      ${win_pix_runtime_SOURCE_DIR}/bin/x64/WinPixEventRuntime.lib
+      delayimp)
 target_link_libraries(d3d12translationlayer WinPixEventRuntime)
 
 target_compile_definitions(d3d12translationlayer PRIVATE $<$<CONFIG:DEBUG>:DBG>)
